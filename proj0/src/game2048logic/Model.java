@@ -85,6 +85,16 @@ public class Model {
      * */
     public boolean emptySpaceExists() {
         // TODO: Task 2. Fill in this function.
+        for (int x = 0; x < board.size(); x++){
+            for (int y = 0; y < board.size(); y++){
+                if (tile(x, y) == null){
+                    return true;
+                }
+                if (tile(x, y).value() == 0){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
