@@ -90,9 +90,6 @@ public class Model {
                 if (tile(x, y) == null){
                     return true;
                 }
-                if (tile(x, y).value() == 0){
-                    return true;
-                }
             }
         }
         return false;
@@ -105,6 +102,16 @@ public class Model {
      */
     public boolean maxTileExists() {
         // TODO: Task 3. Fill in this function.
+        int valueMax = -1;
+        int size = board.size();
+        for (int x = 0; x < size; x++){
+            for (int y = 0; y < size; y++){
+                Tile t = tile(x, y);
+                if (t != null && t.value() == MAX_PIECE){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -116,6 +123,40 @@ public class Model {
      */
     public boolean atLeastOneMoveExists() {
         // TODO: Fill in this function.
+        int size = board.size();
+
+        //情况1：有空格，可以合法移动
+        if (this.emptySpaceExists()){
+            return true;
+        }
+
+        //情况2；棋盘满了，看有无可以合并的tile
+        for (int x = 0; x < size; x++){
+            for (int y = 0; y < size; y++){
+                Tile t = tile(x, y);
+
+                if (t == null){
+                    continue;
+                }
+
+                int v = t.value();
+                //右侧
+                if (x + 1 < size){
+                    Tile right = tile(x + 1, y);
+                    if (right != null && right.value() == v){
+                        return true;
+                    }
+                }
+
+                //上方
+                if (y + 1 < size){
+                    Tile up = tile(x, y + 1);
+                    if (up != null && up.value() == v) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
