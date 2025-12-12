@@ -4,6 +4,7 @@ import game2048rendering.Board;
 import game2048rendering.Side;
 import game2048rendering.Tile;
 
+import java.lang.annotation.Target;
 import java.util.Formatter;
 
 
@@ -180,12 +181,23 @@ public class Model {
         int targetY = y;
         // TODO: Tasks 5, 6, and 10. Fill in this function.
         //处理移动条件
-        while (targetY + 1 < board.size() && (tile(x, targetY+1) == null || (!currTile.wasMerged() && tile(x, targetY+1).value() == myValue))){
-            targetY++;
+        while (targetY + 1 < board.size()){
+            Tile nextTile = board.tile(x, targetY + 1);
+            if (nextTile == null || (nextTile.value() == myValue && !nextTile.wasMerged())){
+                targetY++;
+                if (nextTile != null){
+                    break;
+                }
+            } else{
+                break;
+            }
         }
 
-        if (targetY != y){
+        if (targetY != y && !currTile.wasMerged()){
             board.move(x, targetY, currTile);
+        }
+        if (currTile.wasMerged()) {
+            score += 2 * myValue;
         }
     }
 
@@ -207,10 +219,14 @@ public class Model {
 
     public void tilt(Side side) {
         // TODO: Tasks 8 and 9. Fill in this function.
+        board.setViewingPerspective(side);
+
         int size = board.size();
         for (int x = 0; x < size; x++){
             tiltColumn(x);
         }
+
+        board.setViewingPerspective(Side.NORTH);
     }
 
     /** Tilts every column of the board toward SIDE.
