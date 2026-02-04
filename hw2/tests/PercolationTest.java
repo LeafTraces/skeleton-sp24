@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.Test;
+import edu.princeton.cs.algs4.In;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -82,7 +83,20 @@ public class PercolationTest {
     //       write some more tests and delete the fail() line
     @Test
     public void yourFirstTestHere() {
-        fail("Did you write your own tests?");
+        In in = new In("inputFiles/input1.txt");
+
+        int N = in.readInt();
+        Percolation p = new Percolation(N);
+
+        while (!in.isEmpty()){
+            int row = in.readInt();
+            int col = in.readInt();
+            p.open(row, col);
+        }
+
+        assertThat(p.percolates()).isTrue();
+
+//        fail("Did you write your own tests?");
     }
 
 }
