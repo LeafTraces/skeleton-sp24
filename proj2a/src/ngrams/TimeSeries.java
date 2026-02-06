@@ -1,5 +1,6 @@
 package ngrams;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -30,7 +31,12 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public TimeSeries(TimeSeries ts, int startYear, int endYear) {
         super();
-        // TODO: Fill in this constructor.
+        for (int year : ts.keySet()){
+            if (year >= startYear && year <= endYear){
+                double data = ts.get(year);
+                this.put(year, data);
+            }
+        }
     }
 
     /**
@@ -38,7 +44,7 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public List<Integer> years() {
         // TODO: Fill in this method.
-        return null;
+        return new ArrayList<>(this.keySet());
     }
 
     /**
@@ -47,7 +53,7 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public List<Double> data() {
         // TODO: Fill in this method.
-        return null;
+        return new ArrayList<>(this.values());
     }
 
     /**
@@ -61,7 +67,18 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public TimeSeries plus(TimeSeries ts) {
         // TODO: Fill in this method.
-        return null;
+        TimeSeries returnTS = new TimeSeries();
+        returnTS.putAll(this);
+
+        for (int year : ts.keySet()){
+            if (returnTS.containsKey(year)){
+                returnTS.put(year, ts.get(year) + returnTS.get(year));
+            }
+            else{
+                returnTS.put(year, ts.get(year));
+            }
+        }
+        return returnTS;
     }
 
     /**
@@ -75,7 +92,17 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public TimeSeries dividedBy(TimeSeries ts) {
         // TODO: Fill in this method.
-        return null;
+        TimeSeries returnTS = new TimeSeries();
+
+        for (int year : this.keySet()){
+            if (!ts.containsKey(year)){
+                throw new IllegalArgumentException("Year" + year + "misses");
+            }
+
+            double quotient = this.get(year) / ts.get(year);
+            returnTS.put(year, quotient);
+        }
+        return returnTS;
     }
 
     // TODO: Add any private helper methods.

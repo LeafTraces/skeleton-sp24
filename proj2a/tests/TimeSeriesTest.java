@@ -42,6 +42,7 @@ public class TimeSeriesTest {
         }
     }
 
+
     @Test
     public void testEmptyBasic() {
         TimeSeries catPopulation = new TimeSeries();
