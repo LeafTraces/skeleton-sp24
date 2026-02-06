@@ -1,6 +1,11 @@
 package ngrams;
 
+import edu.princeton.cs.algs4.In;
+
+import javax.xml.stream.events.EndDocument;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.concurrent.TimeoutException;
 
 import static ngrams.TimeSeries.MAX_YEAR;
 import static ngrams.TimeSeries.MIN_YEAR;
@@ -16,14 +21,44 @@ import static ngrams.TimeSeries.MIN_YEAR;
  * @author Josh Hug
  */
 public class NGramMap {
-
     // TODO: Add any necessary static/instance variables.
+    private HashMap<String, TimeSeries> wordMap;     // 存储每个单词的历史数据：Map<单词, 时间序列>
+    private TimeSeries cntTS;                        // 存储每年所有书的总词数：这是一个单独的时间序列
 
     /**
      * Constructs an NGramMap from WORDSFILENAME and COUNTSFILENAME.
      */
     public NGramMap(String wordsFilename, String countsFilename) {
         // TODO: Fill in this constructor. See the "NGramMap Tips" section of the spec for help.
+        this.wordMap = new HashMap<>();
+        this.cntTS = new TimeSeries();
+
+        In cntRead = new In(countsFilename);
+        while (cntRead.hasNextLine()){
+            String line = cntRead.readLine();
+            String[] splitLine = line.split(",");
+            int year = Integer.parseInt(splitLine[0]);
+            double totalCnt = Double.parseDouble(splitLine[1]);
+
+            cntTS.put(year, totalCnt);
+        }
+        cntRead.close();
+
+        In wordRead = new In(wordsFilename);
+        while (wordRead.hasNextLine()){
+            String word = wordRead.readString();
+            int year = wordRead.readInt();
+            double cnt = wordRead.readDouble();
+            wordRead.readLine();
+
+            if (!this.wordMap.containsKey(word)){
+                this.wordMap.put(word, new TimeSeries());
+            }
+
+            TimeSeries ts = this.wordMap.get(word);
+            ts.put(year, cnt);
+        }
+        wordRead.close();
     }
 
     /**
@@ -35,7 +70,11 @@ public class NGramMap {
      */
     public TimeSeries countHistory(String word, int startYear, int endYear) {
         // TODO: Fill in this method.
-        return null;
+        if (!wordMap.containsKey(word)){
+            return new TimeSeries();
+        }
+        TimeSeries data = wordMap.get(word);
+        return new TimeSeries(data, startYear, endYear);
     }
 
     /**
@@ -46,7 +85,7 @@ public class NGramMap {
      */
     public TimeSeries countHistory(String word) {
         // TODO: Fill in this method.
-        return null;
+        return countHistory(word, MIN_YEAR, MAX_YEAR);
     }
 
     /**
@@ -54,7 +93,7 @@ public class NGramMap {
      */
     public TimeSeries totalCountHistory() {
         // TODO: Fill in this method.
-        return null;
+        return new TimeSeries(cntTS, MIN_YEAR, MAX_YEAR);
     }
 
     /**
@@ -64,7 +103,10 @@ public class NGramMap {
      */
     public TimeSeries weightHistory(String word, int startYear, int endYear) {
         // TODO: Fill in this method.
-        return null;
+        if (!wordMap.containsKey(word)){
+            return new TimeSeries();
+        }
+        return countHistory(word, startYear, endYear).dividedBy(totalCountHistory());
     }
 
     /**
@@ -74,7 +116,7 @@ public class NGramMap {
      */
     public TimeSeries weightHistory(String word) {
         // TODO: Fill in this method.
-        return null;
+        return weightHistory(word, MIN_YEAR, MAX_YEAR);
     }
 
     /**
@@ -85,7 +127,15 @@ public class NGramMap {
     public TimeSeries summedWeightHistory(Collection<String> words,
                                           int startYear, int endYear) {
         // TODO: Fill in this method.
-        return null;
+        TimeSeries summedTS = new TimeSeries();
+        for (String word : words){
+            if (!wordMap.containsKey(word)){
+                continue;
+            }
+            TimeSeries ts = weightHistory(word, startYear, endYear);
+            summedTS = summedTS.plus(ts);
+        }
+        return summedTS;
     }
 
     /**
@@ -94,7 +144,7 @@ public class NGramMap {
      */
     public TimeSeries summedWeightHistory(Collection<String> words) {
         // TODO: Fill in this method.
-        return null;
+        return summedWeightHistory(words, MIN_YEAR, MAX_YEAR);
     }
 
     // TODO: Add any private helper methods.
